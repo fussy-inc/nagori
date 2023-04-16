@@ -1,0 +1,45 @@
+{
+  "name": "nagori",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "format": "next lint --fix && prettier --write .",
+    "codegen": "graphql-codegen --config codegen.ts"
+  },
+  "dependencies": {
+    "@types/node": "18.15.11",
+    "@types/react": "18.0.35",
+    "@types/react-dom": "18.0.11",
+    "@vanilla-extract/css": "^1.11.0",
+    "eslint": "8.38.0",
+    "eslint-config-next": "^13.3.0",
+    "firebase-admin": "^11.7.0",
+    "graphql": "^16.6.0",
+    "next": "13.3.0",
+    "nookies": "^2.5.2",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-modal": "^3.16.1",
+    "react-use": "^17.4.0",
+    "typescript": "5.0.4",
+    "urql": "^4.0.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "3.3.0",
+    "@graphql-codegen/client-preset": "3.0.0",
+    "@graphql-codegen/introspection": "3.0.1",
+    "@types/react-modal": "^3.16.0",
+    "@types/uuid": "^9.0.1",
+    "@vanilla-extract/next-plugin": "^2.1.2",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-react": "^7.32.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-unused-imports": "^2.0.0",
+    "prettier": "^2.8.7"
+  }
+}
