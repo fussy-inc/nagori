@@ -72,8 +72,6 @@ const Page: NextPage<Props> = ({ sessionId, errors }) => {
     })();
   }, [sessionId, setCurrentUser]);
 
-  console.log(currentUser);
-
   if (errors.length > 0) {
     return (
       <main>

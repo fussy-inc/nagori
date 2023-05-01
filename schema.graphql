@@ -1,13 +1,27 @@
 input AnswerInput {
   answerTypeEnum: AnswerTypeEnum!
+  dateAnswer: DateAnswerInput
   locationAnswer: LocationAnswerInput
   numberAnswer: NumberAnswerInput
   questionId: Int!
+
+  """
+  reference to response
+  """
   referenceAnswer: ReferenceAnswerInput
+
+  """
+  accept answer type short text, long text, url, image url
+  """
   textAnswer: TextAnswerInput
 }
 
 enum AnswerTypeEnum {
+  """
+  Date
+  """
+  date
+
   """
   Image URL
   """
@@ -17,6 +31,11 @@ enum AnswerTypeEnum {
   Location
   """
   location
+
+  """
+  Long Text
+  """
+  long_text
 
   """
   Number
@@ -29,9 +48,14 @@ enum AnswerTypeEnum {
   reference
 
   """
+  Short Text
+  """
+  short_text
+
+  """
   Text
   """
-  text
+  text @deprecated(reason: "Use SHORT_TEXT or LONG_TEXT instead")
 
   """
   URL
@@ -42,7 +66,14 @@ enum AnswerTypeEnum {
 """
 Union of answer types
 """
-union AnswerUnion = LocationAnswer | NumberAnswer | ReferenceAnswer | TextAnswer
+union AnswerUnion =
+    DateAnswer
+  | LocationAnswer
+  | LongTextAnswer
+  | NumberAnswer
+  | ReferenceAnswer
+  | ShortTextAnswer
+  | TextAnswer
 
 type Category {
   createdAt: ISO8601DateTime!
@@ -123,12 +154,30 @@ type CreateResponsePayload {
   response: Response
 }
 
+type DateAnswer {
+  createdAt: ISO8601DateTime!
+  id: Int!
+  position: Int!
+  question: Question!
+  questionId: Int!
+  response: Response!
+  responseId: Int!
+  updatedAt: ISO8601DateTime!
+  value: ISO8601Date!
+}
+
+input DateAnswerInput {
+  value: ISO8601Date!
+}
+
 type Form {
   categories: [Category!]!
   createdAt: ISO8601DateTime!
   description: String!
   id: Int!
   questions: [Question!]!
+  responseSize: Int!
+  responses: [Response!]!
   title: String!
   updatedAt: ISO8601DateTime!
   user: User!
@@ -146,6 +195,11 @@ type GeoLocation {
   latitude: Float!
   longitude: Float!
 }
+
+"""
+An ISO 8601-encoded date
+"""
+scalar ISO8601Date
 
 """
 An ISO 8601-encoded datetime
@@ -197,6 +251,18 @@ input LocationNearInput {
   distance: Float!
   latitude: Float!
   longitude: Float!
+}
+
+type LongTextAnswer {
+  createdAt: ISO8601DateTime!
+  id: Int!
+  position: Int!
+  question: Question!
+  questionId: Int!
+  response: Response!
+  responseId: Int!
+  updatedAt: ISO8601DateTime!
+  value: String!
 }
 
 type Mutation {
@@ -266,11 +332,13 @@ type Query {
     """
     categoryIds: [Int!]
     ids: [Int!]
+    limit: Int
 
     """
     filter by location nearby
     """
     locationNearby: LocationNearInput
+    order: OrderEnum
   ): [Form!]!
 
   """
@@ -298,26 +366,39 @@ type Query {
 }
 
 type Question {
-  answerType: String!
-  content: String!
+  answerType: AnswerTypeEnum!
+  content: String! @deprecated(reason: "Use `description` instead")
   createdAt: ISO8601DateTime!
+  description: String
   form: Form!
   formId: Int!
   id: Int!
+  label: String!
   position: Int!
+  title: String!
   updatedAt: ISO8601DateTime!
 }
 
 input QuestionInput {
   answerTypeEnum: AnswerTypeEnum!
-  content: String!
+  content: String
+    @deprecated(
+      reason: "Use `title`, `description` and `label` instead properly."
+    )
+  description: String
+  label: String!
   position: Int!
+  title: String!
 }
 
 type ReferenceAnswer {
   createdAt: ISO8601DateTime!
   id: Int!
   position: Int!
+  question: Question!
+  questionId: Int!
+  response: Response!
+  responseId: Int!
   updatedAt: ISO8601DateTime!
 
   """
@@ -327,16 +408,33 @@ type ReferenceAnswer {
 }
 
 input ReferenceAnswerInput {
+  """
+  response id for reference
+  """
   value: Int!
 }
 
 type Response {
   answers: [AnswerUnion!]!
+  createdAt: ISO8601DateTime!
   form: Form!
   formId: Int!
   id: Int!
+  updatedAt: ISO8601DateTime!
   user: User!
   userId: Int!
+}
+
+type ShortTextAnswer {
+  createdAt: ISO8601DateTime!
+  id: Int!
+  position: Int!
+  question: Question!
+  questionId: Int!
+  response: Response!
+  responseId: Int!
+  updatedAt: ISO8601DateTime!
+  value: String!
 }
 
 type TextAnswer {

@@ -19,7 +19,7 @@ export type CurrentUser = {
 
 export const AppContext = createContext(
   {} as {
-    currentUser: CurrentUser | null | undefined;
+    currentUser: CurrentUser | null | undefined; // null: ログインしていない, undefined: ログイン状態を確認中
     setCurrentUser: Dispatch<SetStateAction<CurrentUser | null | undefined>>;
   }
 );
@@ -37,15 +37,22 @@ export default function App({ Component, pageProps }: AppProps) {
     const fussyAccessToken = cookies["fat"];
     if (
       typeof fussyAccessToken == "undefined" ||
-      fussyAccessToken.length == 0 ||
-      currentUser
+      fussyAccessToken.length == 0
     ) {
+      setCurrentUser(null);
+      return;
+    }
+
+    if (currentUser) {
       return;
     }
 
     (async () => {
       const result = await fetchUserByAccessToken(fussyAccessToken);
-      if (result.isFailure()) return;
+      if (result.isFailure()) {
+        setCurrentUser(null);
+        return;
+      }
 
       setCurrentUser(result.value.userByAccessToken);
     })();

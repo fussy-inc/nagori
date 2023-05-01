@@ -1,6 +1,7 @@
 import { FetchNearLocationsQuery } from "~/lib/graphql/graphql";
 import { useCallback, useEffect, useState } from "react";
 import fetchNearLocations from "~/lib/fussy/fetchNearLocations";
+import { useGeolocation } from "react-use";
 
 export type NearLocation = Location & { distance: number };
 
@@ -107,23 +108,32 @@ function convertResponseToLocation(
 }
 
 const useLocations = () => {
-  // const { latitude, longitude, error } = useGeolocation();
-  const { latitude, longitude, error } = {
-    latitude: 35.689487,
-    longitude: 139.691706,
-    error: null,
-  };
+  const { latitude, longitude, error } = useGeolocation();
+  // HTTPS でないと位置情報が取得できないので、開発時は固定値を使う
+  // const { latitude, longitude, error } = {
+  //   latitude: 35.689487,
+  //   longitude: 139.691706,
+  //   error: null,
+  // };
   const [locations, setLocations] = useState<NearLocation[]>([]);
   const [fetched, setFetched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-
-  console.log(latitude);
+  const [lastRequestedAt, setLastRequestedAt] = useState(0);
+  const requestInterval = 1000 * 60; // 1分
 
   const callFetchNearLocations = useCallback(async () => {
-    // if (error) {
-    //   setErrorMessage("位置情報が取得できませんでした\n" + error.message);
-    // }
+    const currentTime = Date.now();
+    // 過剰にAPIにリクエストしないようにする
+    if (currentTime - lastRequestedAt < requestInterval) {
+      return;
+    }
+
+    if (error) {
+      setErrorMessage("位置情報が取得できませんでした");
+      setLoading(false);
+      return;
+    }
 
     if (!latitude || !longitude) {
       setLoading(true);
@@ -132,6 +142,7 @@ const useLocations = () => {
 
     setLoading(true);
     const result = await fetchNearLocations({ latitude, longitude });
+    setLastRequestedAt(currentTime);
     setLoading(false);
 
     if (result.isFailure()) {
@@ -155,15 +166,10 @@ const useLocations = () => {
       });
     setLocations(nearLocations);
     setFetched(true);
-  }, [error, latitude, longitude]);
+  }, [error, lastRequestedAt, latitude, longitude, requestInterval]);
 
   useEffect(() => {
     (async () => await callFetchNearLocations())();
-
-    return () => {
-      setFetched(false);
-      setLoading(false);
-    };
   }, [callFetchNearLocations, latitude, longitude]);
 
   return {

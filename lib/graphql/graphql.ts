@@ -18,29 +18,43 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  /** An ISO 8601-encoded date */
+  ISO8601Date: any;
   /** An ISO 8601-encoded datetime */
   ISO8601DateTime: any;
 };
 
 export type AnswerInput = {
   answerTypeEnum: AnswerTypeEnum;
+  dateAnswer?: InputMaybe<DateAnswerInput>;
   locationAnswer?: InputMaybe<LocationAnswerInput>;
   numberAnswer?: InputMaybe<NumberAnswerInput>;
   questionId: Scalars["Int"];
+  /** reference to response */
   referenceAnswer?: InputMaybe<ReferenceAnswerInput>;
+  /** accept answer type short text, long text, url, image url */
   textAnswer?: InputMaybe<TextAnswerInput>;
 };
 
 export enum AnswerTypeEnum {
+  /** Date */
+  Date = "date",
   /** Image URL */
   ImageUrl = "image_url",
   /** Location */
   Location = "location",
+  /** Long Text */
+  LongText = "long_text",
   /** Number */
   Number = "number",
   /** Reference */
   Reference = "reference",
-  /** Text */
+  /** Short Text */
+  ShortText = "short_text",
+  /**
+   * Text
+   * @deprecated Use SHORT_TEXT or LONG_TEXT instead
+   */
   Text = "text",
   /** URL */
   Url = "url",
@@ -48,9 +62,12 @@ export enum AnswerTypeEnum {
 
 /** Union of answer types */
 export type AnswerUnion =
+  | DateAnswer
   | LocationAnswer
+  | LongTextAnswer
   | NumberAnswer
   | ReferenceAnswer
+  | ShortTextAnswer
   | TextAnswer;
 
 export type Category = {
@@ -107,6 +124,23 @@ export type CreateResponsePayload = {
   response?: Maybe<Response>;
 };
 
+export type DateAnswer = {
+  __typename?: "DateAnswer";
+  createdAt: Scalars["ISO8601DateTime"];
+  id: Scalars["Int"];
+  position: Scalars["Int"];
+  question: Question;
+  questionId: Scalars["Int"];
+  response: Response;
+  responseId: Scalars["Int"];
+  updatedAt: Scalars["ISO8601DateTime"];
+  value: Scalars["ISO8601Date"];
+};
+
+export type DateAnswerInput = {
+  value: Scalars["ISO8601Date"];
+};
+
 export type Form = {
   __typename?: "Form";
   categories: Array<Category>;
@@ -114,6 +148,8 @@ export type Form = {
   description: Scalars["String"];
   id: Scalars["Int"];
   questions: Array<Question>;
+  responseSize: Scalars["Int"];
+  responses: Array<Response>;
   title: Scalars["String"];
   updatedAt: Scalars["ISO8601DateTime"];
   user: User;
@@ -170,6 +206,19 @@ export type LocationNearInput = {
   distance: Scalars["Float"];
   latitude: Scalars["Float"];
   longitude: Scalars["Float"];
+};
+
+export type LongTextAnswer = {
+  __typename?: "LongTextAnswer";
+  createdAt: Scalars["ISO8601DateTime"];
+  id: Scalars["Int"];
+  position: Scalars["Int"];
+  question: Question;
+  questionId: Scalars["Int"];
+  response: Response;
+  responseId: Scalars["Int"];
+  updatedAt: Scalars["ISO8601DateTime"];
+  value: Scalars["String"];
 };
 
 export type Mutation = {
@@ -243,7 +292,9 @@ export type QueryFormArgs = {
 export type QueryFormsArgs = {
   categoryIds?: InputMaybe<Array<Scalars["Int"]>>;
   ids?: InputMaybe<Array<Scalars["Int"]>>;
+  limit?: InputMaybe<Scalars["Int"]>;
   locationNearby?: InputMaybe<LocationNearInput>;
+  order?: InputMaybe<OrderEnum>;
 };
 
 export type QueryResponseArgs = {
@@ -262,20 +313,28 @@ export type QueryUserByAccessTokenArgs = {
 
 export type Question = {
   __typename?: "Question";
-  answerType: Scalars["String"];
+  answerType: AnswerTypeEnum;
+  /** @deprecated Use `description` instead */
   content: Scalars["String"];
   createdAt: Scalars["ISO8601DateTime"];
+  description?: Maybe<Scalars["String"]>;
   form: Form;
   formId: Scalars["Int"];
   id: Scalars["Int"];
+  label: Scalars["String"];
   position: Scalars["Int"];
+  title: Scalars["String"];
   updatedAt: Scalars["ISO8601DateTime"];
 };
 
 export type QuestionInput = {
   answerTypeEnum: AnswerTypeEnum;
-  content: Scalars["String"];
+  /** @deprecated Use `title`, `description` and `label` instead properly. */
+  content?: InputMaybe<Scalars["String"]>;
+  description?: InputMaybe<Scalars["String"]>;
+  label: Scalars["String"];
   position: Scalars["Int"];
+  title: Scalars["String"];
 };
 
 export type ReferenceAnswer = {
@@ -283,23 +342,43 @@ export type ReferenceAnswer = {
   createdAt: Scalars["ISO8601DateTime"];
   id: Scalars["Int"];
   position: Scalars["Int"];
+  question: Question;
+  questionId: Scalars["Int"];
+  response: Response;
+  responseId: Scalars["Int"];
   updatedAt: Scalars["ISO8601DateTime"];
   /** referenced response id */
   value: Scalars["Int"];
 };
 
 export type ReferenceAnswerInput = {
+  /** response id for reference */
   value: Scalars["Int"];
 };
 
 export type Response = {
   __typename?: "Response";
   answers: Array<AnswerUnion>;
+  createdAt: Scalars["ISO8601DateTime"];
   form: Form;
   formId: Scalars["Int"];
   id: Scalars["Int"];
+  updatedAt: Scalars["ISO8601DateTime"];
   user: User;
   userId: Scalars["Int"];
+};
+
+export type ShortTextAnswer = {
+  __typename?: "ShortTextAnswer";
+  createdAt: Scalars["ISO8601DateTime"];
+  id: Scalars["Int"];
+  position: Scalars["Int"];
+  question: Question;
+  questionId: Scalars["Int"];
+  response: Response;
+  responseId: Scalars["Int"];
+  updatedAt: Scalars["ISO8601DateTime"];
+  value: Scalars["String"];
 };
 
 export type TextAnswer = {
@@ -338,6 +417,7 @@ export type FetchNearLocationsQuery = {
     __typename?: "Response";
     id: number;
     answers: Array<
+      | { __typename?: "DateAnswer" }
       | {
           __typename: "LocationAnswer";
           id: number;
@@ -348,6 +428,7 @@ export type FetchNearLocationsQuery = {
             longitude: number;
           };
         }
+      | { __typename?: "LongTextAnswer" }
       | {
           __typename: "NumberAnswer";
           id: number;
@@ -355,6 +436,7 @@ export type FetchNearLocationsQuery = {
           numberValue: number;
         }
       | { __typename?: "ReferenceAnswer" }
+      | { __typename?: "ShortTextAnswer" }
       | {
           __typename: "TextAnswer";
           id: number;

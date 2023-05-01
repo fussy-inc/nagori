@@ -1,6 +1,12 @@
+Work In Progress
+
+---
+
 # nagori
 
 nagori は FUSSY API を利用した聖地巡礼をより楽しくするための Web アプリケーションです。
+
+FUSSY API をご利用いただくにあたっての参考実装として公開されています。
 
 ## 全体の設計について
 
@@ -23,11 +29,9 @@ nagori は FUSSY API を利用した聖地巡礼をより楽しくするため�
 | `NEXT_PUBLIC_FUSSY_API_URL`      | FUSSY API の URL                 | `https://api.fussy.fun`  |
 | `NEXT_PUBLIC_FUSSY_SERVICE_URL`  | FUSSY の URL。認証に利用。       | `https://beta.fussy.fun` |
 | `NEXT_PUBLIC_NAGORI_SERVICE_URL` | サービス の URL。認証に利用。    | `https://beta.fussy.fun` |
-| `FIREBASE_PROJECT_ID`            | サービスのバックエンドとして利用 | -                        |
-| `FIREBASE_PRIVATE_KEY`           | サービスのバックエンドとして利用 | -                        |
-| `FIREBASE_CLIENT_EMAIL`          | サービスのバックエンドとして利用 | -                        |
 
 ## その他
 
 - GraphQL へのリクエストの実装は `lib/` にあります。 Apollo などを利用せず素朴な実装をしています。
   - 一部型定義は [graphql-code-generator](https://the-guild.dev/graphql/codegen) で生成したものを使っています。
+  - `% wget http://static.fussy.fun/api/schema.graphql -O schema.graphql && yarn codegen && yarn format`

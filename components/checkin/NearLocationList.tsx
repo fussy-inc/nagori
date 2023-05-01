@@ -1,8 +1,6 @@
 import { FC, MouseEvent } from "react";
 import Link from "next/link";
 import useNearLocations, { NearLocation } from "~/lib/hooks/useNearLocations";
-import Button from "~/components/common/Button";
-import { usePermission } from "react-use";
 import { locationListStyle } from "~/css/checkin/NearLocationList.css";
 
 type Props = {
@@ -13,7 +11,6 @@ type Props = {
 const NearLocationList: FC<Props> = ({ setNearLocation, openCheckinModal }) => {
   const { locations, loading, fetched, callFetchNearLocations, errorMessage } =
     useNearLocations();
-  const permission = usePermission({ name: "geolocation" });
 
   const handleClickCheckin = (
     e: MouseEvent<HTMLElement>,
@@ -31,12 +28,16 @@ const NearLocationList: FC<Props> = ({ setNearLocation, openCheckinModal }) => {
 
   // 初期状態
   if (!loading && !fetched) {
-    return <Button onClick={callFetchNearLocations}>近くの聖地を探す</Button>;
+    return (
+      <div role="button" onClick={callFetchNearLocations}>
+        近くの聖地を探す
+      </div>
+    );
   }
 
   // loading
   if (loading) {
-    return <div>読み込み中... #{permission}</div>;
+    return <div>読み込み中...</div>;
   }
 
   // loaded

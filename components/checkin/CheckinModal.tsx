@@ -1,5 +1,4 @@
 import Modal from "react-modal";
-import Button from "~/components/common/Button";
 import { FC, MouseEvent, useState } from "react";
 import { NearLocation } from "~/lib/hooks/useNearLocations";
 import { checkinModalStyle } from "~/css/checkin/CheckinModal.css";
@@ -51,7 +50,7 @@ const checkin = async (
 const CheckinModal: FC<Props> = ({ isOpen, closeModal, location }) => {
   const [checkinMessage, setCheckinMessage] = useState<string>("");
   const [isConnecting, setIsConnecting] = useState<boolean>(false);
-  const placeholderMessage = `「${location.name}」での気持ちを書き残しましょう！`;
+  const placeholderMessage = `「${location.name}」での気持ちを書き残そう！`;
 
   const handleClickCheckin = async () => {
     if (isConnecting) {
@@ -73,15 +72,28 @@ const CheckinModal: FC<Props> = ({ isOpen, closeModal, location }) => {
     <Modal isOpen={isOpen} className={checkinModalStyle.modal}>
       <section className={checkinModalStyle.modalContent}>
         <div>チェックイン!</div>
-        <textarea
-          placeholder={placeholderMessage}
-          onChange={(e) => setCheckinMessage(e.target.value)}
-          cols={50}
-          rows={2}
-        />
-        <Button onClick={handleClickCheckin}>記録する</Button>
+        <div className={checkinModalStyle.textareaWrapper}>
+          <textarea
+            placeholder={placeholderMessage}
+            onChange={(e) => setCheckinMessage(e.target.value)}
+            cols={40}
+            rows={2}
+            className={checkinModalStyle.textarea}
+          />
+        </div>
+
+        <div className={checkinModalStyle.buttonContainer}>
+          <button
+            onClick={handleClickCheckin}
+            className={checkinModalStyle.button}
+          >
+            記録する
+          </button>
+          <button onClick={closeModal} className={checkinModalStyle.button}>
+            閉じる
+          </button>
+        </div>
       </section>
-      <button onClick={closeModal}>閉じる</button>
     </Modal>
   );
 };
